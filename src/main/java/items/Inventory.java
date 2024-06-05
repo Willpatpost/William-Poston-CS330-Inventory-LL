@@ -2,7 +2,6 @@ package items;
 
 import containers.LinkedList;
 
-
 /**
  * An Inventory is composed of n slots. Each slot may store only
  * one type of item--specified by *slots*.
@@ -27,9 +26,7 @@ public class Inventory
      */
     public static void mergeStacks(ItemStack lhs, ItemStack rhs)
     {
-        // lhs needs to have items added to it.
-        // rhs's size is needed
-        // lhs.????(rhs.????)
+        lhs.increaseSize(rhs.getSize());
     }
 
     /**
@@ -66,7 +63,7 @@ public class Inventory
      */
     public int utilizedSlots()
     {
-        return this.slots.currentSize;
+        return this.slots.currentSize();
     }
 
     /**
@@ -87,105 +84,41 @@ public class Inventory
     }
 
     /**
-     * Determine if the inventory is considered full.
+     * Check if the inventory is full.
      *
-     * @return true if the current size is equal to capacity
+     * @return true if the inventory is full, false otherwise
      */
     public boolean isFull()
     {
-        // Replace the next line
-        return false;
+        return this.utilizedSlots() >= this.capacity;
     }
 
     /**
-     * Determine if the inventory is empty.
+     * Find an ItemStack that matches the given Item.
      *
-     * @return true if current size is zero
+     * @param item Item to match
+     * @return matching ItemStack or null if not found
      */
-    public boolean isEmpty()
+    public ItemStack findMatchingItemStack(Item item)
     {
-        return this.slots.currentSize == 0;
-    }
-
-    /**
-     * Search through all slots (Nodes in the LinkedList) and look for a
-     * matching ItemStack.
-     *
-     * @param key stack for which the search is being conducted
-     *
-     * @return matching stack if one was found and `null` otherwise
-     */
-    public ItemStack findMatchingItemStack(ItemStack key)
-    {
-        // Add the necessary sequential search loop
-
+        for (int i = 0; i < this.slots.currentSize(); i++)
+        {
+            ItemStack stack = this.slots.get(i);
+            if (stack.getItem().equals(item))
+            {
+                return stack;
+            }
+        }
         return null;
     }
 
     /**
-     * This is the standard Linked List append operation from Review 01
+     * Add an ItemStack to the inventory without any checks.
      *
-     * @param toAdd data that we want to store in a Node and add to the list
+     * @param stack ItemStack to add
      */
-    public void addItemStackNoCheck(ItemStack toAdd)
+    public void addItemStackNoCheck(ItemStack stack)
     {
-        LinkedList.Node<ItemStack> newNode = new LinkedList.Node<>(toAdd);
-
-        // Use the appendNode/add logic from Review 1 as your starting point
-        // Once we reach this function... we know that `toAdd` must be stored
-    }
-
-    /**
-     * Add one or more items to the inventory list.
-     *
-     * @param stack new stack of items to add
-     *
-     * @return true if *stack* was added and false otherwise
-     */
-    public boolean addItems(ItemStack stack)
-    {
-        ItemStack match = this.findMatchingItemStack(stack);
-
-        // if a match was found
-        if (match != null) {
-            // If the Item is stackable, add it to the ItemStack
-            if (match.permitsStacking()) {
-                mergeStacks(match, stack);
-
-                return true;
-            }
-        }
-
-        if (this.slots.currentSize < capacity) {
-            this.addItemStackNoCheck(stack);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * *Print* a Summary of the Inventory and all Items contained within.
-     */
-    @Override
-    public String toString()
-    {
-        String summaryLine = String.format(
-            " -Used %d of %d slots%n", this.slots.currentSize, this.capacity
-        );
-
-        StringBuilder strBld = new StringBuilder();
-        strBld.append(summaryLine);
-
-        LinkedList.Node<ItemStack> it = this.slots.head;
-
-        while (it != null) {
-            String itemLine = String.format("  %s%n", it.data);
-            strBld.append(itemLine);
-
-            it = it.next;
-        }
-
-        return strBld.toString();
+        this.slots.add(stack);
     }
 }
